@@ -16,6 +16,7 @@ import java.util.List;
 public class UserService {
 
     private final InMemoryUserStorageImpl userStorage;
+
     public List<UserDto> getAllUsers() {
         return UserMapper.toUsersDto(userStorage.getAllUsers());
     }
