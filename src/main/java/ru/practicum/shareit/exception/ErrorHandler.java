@@ -1,36 +1,32 @@
 package ru.practicum.shareit.exception;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.Map;
+import javax.validation.ConstraintViolationException;
 
 @RestControllerAdvice
 public class ErrorHandler {
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handleNotFoundException(final ObjectNotFoundException e) {
-        return Map.of("404 OBJECT NOT FOUND", e.getMessage());
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<?> constraintViolationException(final ConstraintViolationException e) {
+        return new ResponseEntity<>(new ErrorResponse(String.valueOf(e.getClass()), e.getMessage()),
+                HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public Map<String, String> handleUserAlreadyExists(final UserAlreadyExist e) {
-        return Map.of("409 USER ALREADY EXISTS", e.getMessage());
+    @ExceptionHandler(EmailDuplicateException.class)
+    public ResponseEntity<?> emailDuplicateException(final EmailDuplicateException e) {
+        return new ResponseEntity<>(new ErrorResponse(String.valueOf(e.getClass()), e.getMessage()),
+                HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public Map<String, String> handleItemAccessDeniedException(final ItemAccessDeniedException e) {
-        return Map.of("409 USER HAVEN'T ACCESS", e.getMessage());
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<?> entityNotFoundException(final EntityNotFoundException e) {
+        return new ResponseEntity<>(new ErrorResponse(String.valueOf(e.getClass()), e.getMessage()),
+                HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleBadRequestException(final InvalidEntityException e) {
-        return Map.of("400 BAD REQUEST", e.getMessage());
-    }
 }

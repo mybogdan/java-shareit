@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -19,35 +19,35 @@ import java.util.List;
 @RequestMapping(path = "/users")
 public class UserController {
 
-    private final UserService userService;
+    private final UserServiceImpl userServiceImpl;
 
     @GetMapping
     public List<UserDto> getAllUsers() {
-        log.info("Запрос на поиск всех пользователей.");
-        return userService.getAllUsers();
+        log.info("Получен GET запрос по эндпоинту /users на получение всех существующих Users.");
+        return userServiceImpl.getAllUsers();
     }
 
     @GetMapping("/{id}")
     public UserDto getUserById(@PathVariable("id") Long userId) {
-        log.info("Запрос на получение пользователя по id.");
-        return userService.getUserById(userId);
+        log.info("Получен GET запрос по эндпоинту /users/{} на получение User с ID {}.", userId, userId);
+        return userServiceImpl.getUserById(userId);
     }
 
     @PostMapping
     public UserDto create(@Valid @RequestBody UserDto userDto) {
-        log.info("Запрос на создание пользователя.");
-        return userService.addUser(userDto);
+        log.info("Получен POST запрос по эндпоинту /users на добавление User {}.", userDto);
+        return userServiceImpl.addUser(userDto);
     }
 
     @PatchMapping("/{id}")
     public UserDto update(@PathVariable("id") Long userId, @RequestBody UserDto userDto) {
-        log.info("Запрос на обновление пользователя.");
-        return userService.updateUser(userId, userDto);
+        log.info("Получен PATCH запрос по эндпоинту /users/{} на обновление данных User с ID {}.", userId, userId);
+        return userServiceImpl.updateUser(userId, userDto);
     }
 
     @DeleteMapping("/{id}")
     public Boolean delete(@PathVariable("id") Long userId) {
-        log.info("Запрос на удаление пользователя.");
-        return userService.delete(userId);
+        log.info("Получен DELETE запрос по эндпоинту /users/{} на удаление User с ID {}.", userId, userId);
+        return userServiceImpl.delete(userId);
     }
 }

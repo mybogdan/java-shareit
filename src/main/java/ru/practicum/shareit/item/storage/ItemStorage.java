@@ -10,13 +10,13 @@ public interface ItemStorage {
 
     Item updateItem(Long userId, Long itemId, Item toItem);
 
-    Item getItemById(Long itemId);
+    Item getItemById(Long userId, Long itemId);
 
     List<Item> getAllItems(Long userId);
 
-    List<Item> searchItems(String text);
+    List<Item> searchItems(Long userId, String text);
 
-    Boolean deleteItem(Long itemId);
+    Boolean deleteItem(Long userId, Long itemId);
 
     Boolean isItemExists(Long id);
 }

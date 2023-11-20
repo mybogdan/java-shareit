@@ -1,9 +1,12 @@
 package ru.practicum.shareit.item.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 import org.apache.catalina.connector.Request;
 import ru.practicum.shareit.user.model.User;
+
+import javax.validation.constraints.NotBlank;
 
 /**
  * TODO Sprint add-controllers.
@@ -13,21 +16,13 @@ import ru.practicum.shareit.user.model.User;
 @Builder
 public class Item {
     private Long id;
+    @NotBlank
     private String name;
+    @NotBlank
     private String description;
     private Boolean available;
+    @JsonIgnore
     private User owner;
+    @JsonIgnore
     private Request request;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Item)) return false;
-        return id != null && id.equals(((Item) o).getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
 }

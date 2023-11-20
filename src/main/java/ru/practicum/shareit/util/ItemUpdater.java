@@ -1,9 +1,9 @@
-package ru.practicum.shareit.validator;
+package ru.practicum.shareit.util;
 
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 
-public class ItemValidator {
+public class ItemUpdater {
     public static boolean itemCheck(ItemDto item) {
         return item.getName() == null ||
                 item.getName().isBlank() ||

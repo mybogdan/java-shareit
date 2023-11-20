@@ -4,8 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.item.service.ItemServiceImpl;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -17,31 +18,36 @@ import java.util.List;
 @Slf4j
 public class ItemController {
 
-    private final ItemService itemService;
+    private final ItemServiceImpl itemServiceImpl;
     private static final String USERID_HEADER = "X-Sharer-User-Id";
 
     @GetMapping
     public List<ItemDto> getAllItems(@RequestHeader(USERID_HEADER) Long userId) {
-        log.info("Запрос на получение списка своих вещей.");
-        return itemService.getAllItems(userId);
+        log.info("Получен GET запрос по эндпоинту /items от User(Owner) c ID {} на получение списка всех своих Items.",
+                userId);
+        return itemServiceImpl.getAllItems(userId);
     }
 
     @GetMapping("/{itemId}")
     public ItemDto getItemById(@RequestHeader(USERID_HEADER) Long userId, @PathVariable Long itemId) {
-        log.info("Запрос на получение вещи по id.");
-        return itemService.getItemById(userId, itemId);
+        log.info("Получен GET запрос по эндпоинту /items/{} от User c ID {} на получение Item с ID {}.", itemId, userId,
+                itemId);
+        return itemServiceImpl.getItemById(userId, itemId);
     }
 
     @GetMapping("/search")
     public List<ItemDto> searchItems(@RequestHeader(USERID_HEADER) Long userId, @RequestParam String text) {
-        log.info("Запрос на поиск вещи.");
-        return itemService.searchItems(text);
+        log.info(
+                "Получен GET запрос по эндпоинту /items/search от User c ID {} на получение списка Item по запросу '{}'.",
+                userId, text);
+        return itemServiceImpl.searchItems(userId, text);
     }
 
     @PostMapping
-    public ItemDto addItem(@RequestHeader(USERID_HEADER) Long userId, @RequestBody ItemDto itemDto) {
-        log.info("Запрос на добавление вещи.");
-        return itemService.addItem(userId, itemDto);
+    public ItemDto addItem(@RequestHeader(USERID_HEADER) Long userId, @Valid @RequestBody ItemDto itemDto) {
+        log.info("Получен POST запрос по эндпоинту /items от User(Owner) c ID {} на добавление Item {}.", userId,
+                itemDto);
+        return itemServiceImpl.addItem(userId, itemDto);
     }
 
     @PatchMapping("/{itemId}")
@@ -49,13 +55,16 @@ public class ItemController {
             @RequestHeader(USERID_HEADER) Long userId,
             @PathVariable Long itemId,
             @RequestBody ItemDto itemDto) {
-        log.info("Запрос на редактирование вещи.");
-        return itemService.updateItem(userId, itemId, itemDto);
+        log.info(
+                "Получен PATCH запрос по эндпоинту /items/{} от User(Owner) c ID {} на обновление данных Item с ID {}.",
+                itemId, userId, itemId);
+        return itemServiceImpl.updateItem(userId, itemId, itemDto);
     }
 
     @DeleteMapping("/{itemId}")
-    public Boolean deleteItem(@PathVariable Long itemId) {
-        log.info("Запрос на удаление вещи.");
-        return itemService.deleteItem(itemId);
+    public Boolean deleteItem(@RequestHeader(USERID_HEADER) Long userId, @PathVariable Long itemId) {
+        log.info("Получен DELETE запрос по эндпоинту /items/{} от User(Owner) c ID {} на удаление Item с ID {}.", itemId,
+                userId, itemId);
+        return itemServiceImpl.deleteItem(userId, itemId);
     }
 }

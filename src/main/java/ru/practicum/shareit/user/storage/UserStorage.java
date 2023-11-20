@@ -15,7 +15,7 @@ public interface UserStorage {
 
     Boolean deleteUser(Long userId);
 
-    Boolean isUserExistsById(Long userId);
+    Boolean userExistValidation(Long userId);
 
-    Boolean isUserExistsByEmail(String email);
+    Boolean duplicateCheck(String email);
 }
