@@ -29,4 +29,9 @@ public class ErrorHandler {
                 HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler
+    public ResponseEntity<?> handleThrowable(final Throwable e) {
+        return new ResponseEntity<>(new ErrorResponse(String.valueOf(e.getClass()), e.getMessage()),
+                HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

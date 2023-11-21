@@ -24,6 +24,7 @@ public class UserServiceImpl implements UserService {
         return UserMapper.toUsersDto(userStorage.getAllUsers());
     }
 
+    @Override
     public UserDto getUserById(Long userId) {
         if (!userStorage.userExistValidation(userId)) {
             log.info("User с ID {} не найден .", userId);

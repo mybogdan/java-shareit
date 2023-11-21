@@ -9,8 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemStorage;
 import ru.practicum.shareit.user.mapper.UserMapper;
-import ru.practicum.shareit.user.service.UserServiceImpl;
-import ru.practicum.shareit.util.ItemUpdater;
+import ru.practicum.shareit.user.service.UserService;
 
 import java.util.*;
 
@@ -20,14 +19,14 @@ import java.util.*;
 @RequiredArgsConstructor
 public class InMemoryItemStorageImpl implements ItemStorage {
 
-    private final UserServiceImpl userServiceImpl;
+    private final UserService userService;
     private final Map<Long, Item> items = new HashMap<>();
     private Long idItems = 0L;
 
     @Override
     public Item addItem(Long userId, Item item) {
         item.setId(++idItems);
-        item.setOwner(UserMapper.toUser(userServiceImpl.getUserById(userId)));
+        item.setOwner(UserMapper.toUser(userService.getUserById(userId)));
         items.put(item.getId(), item);
         log.info("User(Owner) c ID {} создал Item c ID {}.", userId, item.getId());
         return item;
@@ -35,15 +34,8 @@ public class InMemoryItemStorageImpl implements ItemStorage {
 
     @Override
     public Item updateItem(Long userId, Long itemId, Item item) {
-        Item oldItem = items.get(itemId);
-
-        if (!Objects.equals(oldItem.getOwner().getId(), userId)) {
-            log.info("User с ID {} не является owner.", userId);
-            throw new ResponseStatusException(HttpStatus.valueOf(404), "User с ID {} не является owner.");
-        }
-        ItemUpdater.itemPatch(oldItem, item);
-        log.info("User(Owner) c ID {} обновил данные Item c ID {}.", userId, oldItem.getId());
-        return oldItem;
+        log.info("User(Owner) c ID {} обновил данные Item c ID {}.", userId, itemId);
+        return items.put(itemId, item);
     }
 
     @Override
