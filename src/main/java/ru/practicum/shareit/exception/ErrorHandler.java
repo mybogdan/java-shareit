@@ -2,6 +2,7 @@ package ru.practicum.shareit.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -34,4 +35,11 @@ public class ErrorHandler {
         return new ResponseEntity<>(new ErrorResponse(String.valueOf(e.getClass()), e.getMessage()),
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler
+    public ResponseEntity<?> methodArgumentNotValidException(final MethodArgumentNotValidException e) {
+        return new ResponseEntity<>(new ErrorResponse(String.valueOf(e.getClass()), e.getMessage()),
+                HttpStatus.BAD_REQUEST);
+    }
+
 }

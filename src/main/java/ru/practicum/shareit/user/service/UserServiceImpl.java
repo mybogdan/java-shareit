@@ -3,6 +3,7 @@ package ru.practicum.shareit.user.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.EmailDuplicateException;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -36,7 +37,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto addUser(UserDto userDto) {
         if (userDto.getEmail() == null || userDto.getEmail().isEmpty() || userDto.getEmail().isBlank()) {
-            throw new IllegalArgumentException("Некорректный email.");
+            log.info("Некорректный email.");
+            throw new BadRequestException("Некорректный email.");
         }
         if (userStorage.duplicateCheck(userDto.getEmail())) {
             log.info("Некорректный запрос. Данный Email уже существует.");
