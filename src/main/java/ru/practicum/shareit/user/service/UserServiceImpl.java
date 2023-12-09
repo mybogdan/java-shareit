@@ -32,18 +32,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getUserById(Long userId) {
         return repository.findById(userId).map(UserMapper::toUserDto)
-                .orElseThrow(() ->
-                        new ObjectNotFoundException("Пользователь не найден."));
+                .orElseThrow(() -> new ObjectNotFoundException("Пользователь не найден."));
     }
 
     @Transactional
     @Override
     public UserDto addUser(UserDto userDto) {
         if (userDto.getEmail() == null || userDto.getEmail().isEmpty() || userDto.getEmail().isBlank()) {
+            log.info("Некорректный email.");
             throw new IllegalArgumentException("Некорректный email.");
         }
         if (repository.existsUserByEmail(userDto.getEmail())) {
             repository.save(UserMapper.toUser(userDto));
+            log.info("Пользователь уже существует.");
             throw new EntityAlreadyExist("Пользователь уже существует.");
         }
         return UserMapper.toUserDto(repository.save(UserMapper.toUser(userDto)));
@@ -61,6 +62,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void delete(Long userId) {
         if (!repository.existsById(userId)) {
+            log.info("Пользователь не найден.");
             throw new ObjectNotFoundException("Пользователь не найден.");
         }
         repository.deleteById(userId);
@@ -75,6 +77,7 @@ public class UserServiceImpl implements UserService {
             if (!repository.existsUserByEmail(user.getEmail())) {
                 updatedUser.setEmail(user.getEmail());
             } else {
+                log.info("Такой email уже существует.");
                 throw new EntityAlreadyExist("Такой email уже существует.");
             }
         }

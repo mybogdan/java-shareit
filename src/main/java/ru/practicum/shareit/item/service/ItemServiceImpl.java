@@ -93,6 +93,7 @@ public class ItemServiceImpl implements ItemService {
         Item updatedItem = repository.findById(itemId)
                 .orElseThrow(() -> new ObjectNotFoundException("Такой вещи не существует."));
         if (!Objects.equals(updatedItem.getOwner().getId(), userId)) {
+            log.info("Товар не принадлежит этому пользователю.");
             throw new ObjectNotFoundException("Товар не принадлежит этому пользователю.");
         }
 
@@ -104,6 +105,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public void deleteItem(Long userId, Long itemId) {
         if (!repository.existsById(itemId)) {
+            log.info("Такой вещи не существует.");
             throw new ObjectNotFoundException("Такой вещи не существует.");
         }
         repository.deleteById(itemId);
@@ -123,12 +125,15 @@ public class ItemServiceImpl implements ItemService {
 
     private void validateComment(Long userId, Long itemId, CommentDto commentDto) {
         if (commentDto.getText().isEmpty() || commentDto.getText().isBlank()) {
+            log.info("Неверный текст комментария.");
             throw new InvalidEntityException("Неверный текст комментария.");
         }
         if (!isAlreadyBooked(userId, itemId)) {
+            log.info("Пользователь уже держит элемент.");
             throw new InvalidEntityException("Пользователь уже держит элемент.");
         }
         if (isOwner(userId, itemId)) {
+            log.info("Пользователь является владельцем.");
             throw new InvalidEntityException("Пользователь является владельцем.");
         }
     }
@@ -136,6 +141,7 @@ public class ItemServiceImpl implements ItemService {
     private Boolean isAlreadyBooked(Long userId, Long itemId) {
         List<Booking> bookingList = bookingRepository.findByBooker_IdAndItem_IdOrderByStartAsc(userId, itemId);
         if (bookingList.isEmpty()) {
+            log.info("Пользователь не забронировал товар.");
             throw new InvalidEntityException("Пользователь не забронировал товар.");
         }
         return bookingList.stream()
@@ -145,8 +151,7 @@ public class ItemServiceImpl implements ItemService {
 
     private Boolean isOwner(Long userId, Long itemId) {
         return repository.findById(itemId)
-                .orElseThrow(() ->
-                        new ObjectNotFoundException("Пользователь не найден.")).getOwner().getId().equals(userId);
+                .orElseThrow(() -> new ObjectNotFoundException("Пользователь не найден.")).getOwner().getId().equals(userId);
     }
 
     private Item itemUpdate(Item updatedItem, ItemDto itemDto) {

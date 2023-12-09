@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -26,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
@@ -43,6 +45,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public BookingInfoDto addBooking(Long userId, BookingDto bookingDto) {
         if (!BookingValidator.bookingValidate(bookingDto)) {
+            log.info("BookingDto недействителен.");
             throw new InvalidEntityException("BookingDto недействителен.");
         }
 
@@ -52,6 +55,7 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new ObjectNotFoundException(ITEM_ERROR));
 
         if (!item.getAvailable()) {
+            log.info(ITEM_ERROR);
             throw new InvalidEntityException(ITEM_ERROR);
         }
 
@@ -80,12 +84,14 @@ public class BookingServiceImpl implements BookingService {
         Item item = booking.getItem();
 
         if (!item.getOwner().getId().equals(userId)) {
+            log.info("Невозможно подтвердить бронирование. Пользователь не является владельцем этого объекта.");
             throw new ObjectNotFoundException("Невозможно подтвердить бронирование. Пользователь не является владельцем этого объекта.");
         }
 
         BookingStatus bookingStatus = approved ? BookingStatus.APPROVED : BookingStatus.REJECTED;
 
         if (booking.getStatus() == bookingStatus) {
+            log.info("Статус: " + bookingStatus);
             throw new InvalidEntityException("Статус: " + bookingStatus);
         }
 
@@ -101,6 +107,7 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new ObjectNotFoundException(BOOKING_ERROR));
 
         if (!userId.equals(booking.getItem().getOwner().getId()) && !userId.equals(booking.getBooker().getId())) {
+           log.info("Этот пользователь не является владельцем объекта.");
             throw new ObjectNotFoundException("Этот пользователь не является владельцем объекта.");
         }
 
@@ -191,6 +198,7 @@ public class BookingServiceImpl implements BookingService {
         try {
             return BookingState.valueOf(state.toUpperCase());
         } catch (IllegalArgumentException exception) {
+            log.info(String.format("Unknown state: %s", state));
             throw new UnknownBookingState(String.format("Unknown state: %s", state));
         }
     }
