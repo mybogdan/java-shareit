@@ -9,7 +9,7 @@ import ru.practicum.shareit.item.model.Item;
 import java.util.List;
 
 @Repository
-public interface ItemJpaRepository extends JpaRepository<Item, Long> {
+public interface ItemRepository extends JpaRepository<Item, Long> {
     @Query("SELECT it FROM Item it " +
             "WHERE (LOWER(it.name) LIKE LOWER(CONCAT('%', :text, '%') ) OR " +
             "LOWER(it.description) LIKE LOWER(CONCAT('%', :text, '%'))) " +

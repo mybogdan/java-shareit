@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.booking.enums.BookingStatus;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
@@ -11,10 +12,13 @@ import java.time.LocalDateTime;
 public class BookingDto {
     private Long id;
 
+    @NotNull
     private LocalDateTime start;
 
+    @NotNull
     private LocalDateTime end;
 
+    @NotNull
     private Long itemId;
 
     private Long bookerId;

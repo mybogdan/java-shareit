@@ -17,9 +17,9 @@ import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
-import ru.practicum.shareit.item.repository.ItemJpaRepository;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.model.ItemRequest;
-import ru.practicum.shareit.user.repository.UserJpaRepository;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -33,8 +33,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ItemServiceImpl implements ItemService {
 
-    private final ItemJpaRepository repository;
-    private final UserJpaRepository userRepository;
+    private final ItemRepository repository;
+    private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
 
@@ -82,8 +82,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto addItem(Long userId, ItemDto itemDto) {
         Item newItem = ItemMapper.toItem(itemDto);
-        newItem.setOwner(userRepository.findById(userId).orElseThrow(() ->
-                new ObjectNotFoundException("Пользователь не найден.")));
+        newItem.setOwner(userRepository.findById(userId)
+                .orElseThrow(() -> new ObjectNotFoundException("Пользователь не найден.")));
         return ItemMapper.toItemDto(repository.save(newItem));
     }
 
@@ -91,8 +91,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto) {
         Item updatedItem = repository.findById(itemId)
-                .orElseThrow(() ->
-                        new ObjectNotFoundException("Такой вещи не существует."));
+                .orElseThrow(() -> new ObjectNotFoundException("Такой вещи не существует."));
         if (!Objects.equals(updatedItem.getOwner().getId(), userId)) {
             throw new ObjectNotFoundException("Товар не принадлежит этому пользователю.");
         }
