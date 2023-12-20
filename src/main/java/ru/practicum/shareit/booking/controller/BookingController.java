@@ -7,6 +7,9 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingInfoDto;
 import ru.practicum.shareit.booking.service.BookingServiceImpl;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @Slf4j
@@ -19,7 +22,7 @@ public class BookingController {
     private final BookingServiceImpl bookingServiceImpl;
 
     @PostMapping
-    public BookingInfoDto addBooking(@RequestHeader(USERID_HEADER) Long userId, @RequestBody BookingDto bookingDto) {
+    public BookingInfoDto addBooking(@RequestHeader(USERID_HEADER) Long userId, @Valid @RequestBody BookingDto bookingDto) {
         log.info("Пришел POST запрос на добавление новой аренды {} от пользователя с id {}", bookingDto, userId);
         return bookingServiceImpl.addBooking(userId, bookingDto);
     }
@@ -43,8 +46,8 @@ public class BookingController {
     @GetMapping
     public List<BookingInfoDto> getBooking(@RequestHeader(USERID_HEADER) Long userId,
                                            @RequestParam(name = "state", defaultValue = "all") String stateParam,
-                                           @RequestParam(required = false, defaultValue = "0") Integer from,
-                                           @RequestParam(required = false, defaultValue = "10") Integer size) {
+                                           @RequestParam(required = false, defaultValue = "0") @PositiveOrZero Integer from,
+                                           @RequestParam(required = false, defaultValue = "10") @Positive Integer size) {
         log.info("Пришел /GET запрос на получение списка всех бронирований для пользователя с id {}, и с параметром {}",
                 userId, stateParam);
         return bookingServiceImpl.getBooking(userId, stateParam, from, size);
@@ -53,8 +56,8 @@ public class BookingController {
     @GetMapping("/owner")
     public List<BookingInfoDto> getAllByOwner(@RequestHeader(USERID_HEADER) Long userId,
                                               @RequestParam(name = "state", defaultValue = "all") String stateParam,
-                                              @RequestParam(required = false, defaultValue = "0") Integer from,
-                                              @RequestParam(required = false, defaultValue = "10") Integer size) {
+                                              @RequestParam(required = false, defaultValue = "0") @PositiveOrZero Integer from,
+                                              @RequestParam(required = false, defaultValue = "10") @Positive Integer size) {
         log.info("Пришел /GET запрос на получение списка всех бронирований для владельца с id {}, и с параметром {}",
                 userId, stateParam);
         return bookingServiceImpl.getOwnerBooking(userId, stateParam, from, size);

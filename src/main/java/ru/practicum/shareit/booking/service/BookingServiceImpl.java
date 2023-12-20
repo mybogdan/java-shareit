@@ -45,7 +45,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingInfoDto addBooking(Long userId, BookingDto bookingDto) {
-        if (!BookingValidator.bookingValidate(bookingDto)) {
+        if (!BookingValidator.isBookingTimeIntervalValid(bookingDto)) {
             log.info("BookingDto недействителен.");
             throw new InvalidEntityException("BookingDto недействителен.");
         }
