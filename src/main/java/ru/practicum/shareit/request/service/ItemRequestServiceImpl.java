@@ -68,8 +68,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                 new ObjectNotFoundException(USER_NOT_FOUND));
 
         return itemRequestRepository
-                .findAllByRequestorIdIsNot
-                        (userId, PageRequest.of((from / size), size, Sort.by("created")
+                .findAllByRequestorIdIsNot(userId, PageRequest.of((from / size), size, Sort.by("created")
                                 .descending()))
                 .stream()
                 .map(this::toItemRequestDto)
