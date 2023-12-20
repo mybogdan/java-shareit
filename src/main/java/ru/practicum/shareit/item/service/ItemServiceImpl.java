@@ -19,6 +19,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import javax.transaction.Transactional;
@@ -37,9 +38,10 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
     @Override
-    public List<ItemInfoDto> getAllItems(Long userId) {
+    public List<ItemInfoDto> getItems(Long userId) {
         return repository.findAllByOwnerId(userId)
                 .stream()
                 .map(ItemMapper::toItemInfo)
@@ -48,7 +50,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemInfoDto getItemById(Long userId, Long itemId) {
+    public ItemInfoDto getItem(Long userId, Long itemId) {
         Item item = repository.findById(itemId)
                 .orElseThrow(() -> new ObjectNotFoundException("Такой вещи не существует."));
 
@@ -69,7 +71,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> searchItems(Long userId, String text) {
+    public List<ItemDto> searchItems(String text) {
         if (text.isEmpty()) {
             return Collections.emptyList();
         } else {
@@ -79,11 +81,22 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
+    @Transactional
     @Override
     public ItemDto addItem(Long userId, ItemDto itemDto) {
+        if (itemCheck(itemDto)) {
+            throw new InvalidEntityException("Недопустимое тело элемента.");
+        }
         Item newItem = ItemMapper.toItem(itemDto);
         newItem.setOwner(userRepository.findById(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("Пользователь не найден.")));
+
+        if (itemDto.getRequestId() == null) {
+            return ItemMapper.toItemDto(repository.save(newItem));
+        }
+        ItemRequest itemRequest = itemRequestRepository.findById(itemDto.getRequestId())
+                .orElseThrow(() -> new ObjectNotFoundException("Запрос не найден."));
+        newItem.setRequest(itemRequest);
         return ItemMapper.toItemDto(repository.save(newItem));
     }
 
@@ -98,12 +111,13 @@ public class ItemServiceImpl implements ItemService {
         }
 
         updatedItem = itemUpdate(updatedItem, itemDto);
-        return ItemMapper.toItemDto(repository.save(updatedItem));
+        repository.save(updatedItem);
+        return ItemMapper.toItemDto(updatedItem);
     }
 
     @Transactional
     @Override
-    public void deleteItem(Long userId, Long itemId) {
+    public void deleteItem(Long itemId) {
         if (!repository.existsById(itemId)) {
             log.info("Такой вещи не существует.");
             throw new ObjectNotFoundException("Такой вещи не существует.");
@@ -115,10 +129,10 @@ public class ItemServiceImpl implements ItemService {
     public CommentDto addComment(Long userId, Long itemId, CommentDto commentDto) {
         validateComment(userId, itemId, commentDto);
         Comment comment = CommentMapper.toComment(commentDto);
-        comment.setItem(repository.findById(itemId).orElseThrow(() ->
-                new ObjectNotFoundException("Такой вещи не существует.")));
-        comment.setUser(userRepository.findById(userId).orElseThrow(() ->
-                new ObjectNotFoundException("Пользователь не найден.")));
+        comment.setItem(repository.findById(itemId)
+                .orElseThrow(() -> new ObjectNotFoundException("Такой вещи не существует.")));
+        comment.setUser(userRepository.findById(userId)
+                .orElseThrow(() -> new ObjectNotFoundException("Пользователь не найден.")));
         comment.setCreated(LocalDateTime.now());
         return CommentMapper.toCommentDto(commentRepository.save(comment));
     }
@@ -151,7 +165,8 @@ public class ItemServiceImpl implements ItemService {
 
     private Boolean isOwner(Long userId, Long itemId) {
         return repository.findById(itemId)
-                .orElseThrow(() -> new ObjectNotFoundException("Пользователь не найден.")).getOwner().getId().equals(userId);
+                .orElseThrow(() -> new ObjectNotFoundException("Пользователь не найден."))
+                .getOwner().getId().equals(userId);
     }
 
     private Item itemUpdate(Item updatedItem, ItemDto itemDto) {
@@ -165,11 +180,12 @@ public class ItemServiceImpl implements ItemService {
             updatedItem.setAvailable(itemDto.getAvailable());
         }
         if (itemDto.getOwner() != null) {
-            updatedItem.setOwner(userRepository.findById(itemDto.getOwner().getId())
+            updatedItem.setOwner(userRepository.findById(itemDto.getOwner())
                     .orElseThrow(() -> new ObjectNotFoundException("Пользователь не найден.")));
         }
-        if (itemDto.getRequest() != null) {
-            updatedItem.setRequest(new ItemRequest());
+        if (itemDto.getRequestId() != null) {
+            updatedItem.setRequest(itemRequestRepository.findById(itemDto.getRequestId())
+                    .orElseThrow(() -> new ObjectNotFoundException("Запрос не найден.")));
         }
         return updatedItem;
     }
@@ -193,5 +209,15 @@ public class ItemServiceImpl implements ItemService {
                 item.setNextBooking(BookingMapper.toBookingItem(nextBooking));
             }
         }
+    }
+
+    private boolean itemCheck(ItemDto item) {
+        return item.getName() == null ||
+                item.getName().isBlank() ||
+                item.getName().isEmpty() ||
+                item.getAvailable() == null ||
+                item.getDescription() == null ||
+                item.getDescription().isEmpty() ||
+                item.getDescription().isBlank();
     }
 }
