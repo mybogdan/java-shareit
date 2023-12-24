@@ -26,13 +26,13 @@ import java.util.stream.Collectors;
 public class ItemRequestServiceImpl implements ItemRequestService {
     private static final String USER_NOT_FOUND = "Пользователь не найден.";
     private final ItemRequestRepository itemRequestRepository;
-    private final UserRepository userJpaRepository;
+    private final UserRepository userRepository;
     private final ItemRepository itemRepository;
 
 
     @Override
     public List<ItemRequestDto> getRequests(Long userId) {
-        userJpaRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new ObjectNotFoundException(USER_NOT_FOUND));
         return itemRequestRepository.findAllByRequestorId(userId)
                 .stream()
@@ -44,16 +44,16 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public ItemRequestDto addRequest(Long userId, ItemRequestDto itemRequestDto) {
         itemRequestDto.setRequestor(userId);
         itemRequestDto.setCreated(LocalDateTime.now());
-        User user = userJpaRepository.findById(userId).orElseThrow(() ->
-                new ObjectNotFoundException(USER_NOT_FOUND));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ObjectNotFoundException(USER_NOT_FOUND));
         ItemRequest itemRequest = RequestMapper.toItemRequest(itemRequestDto, user);
         return this.toItemRequestDto(itemRequestRepository.save(itemRequest));
     }
 
     @Override
     public ItemRequestDto getRequestById(Long userId, Long requestId) {
-        userJpaRepository.findById(userId).orElseThrow(() ->
-                new ObjectNotFoundException(USER_NOT_FOUND));
+        userRepository.findById(userId)
+                .orElseThrow(() -> new ObjectNotFoundException(USER_NOT_FOUND));
         return this.toItemRequestDto(itemRequestRepository.findById(requestId)
                 .orElseThrow(() -> new ObjectNotFoundException("Запрос не найден.")));
     }
@@ -64,9 +64,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             log.info("Аргументы не могут быть отрицательными.");
             throw new InvalidEntityException("Аргументы не могут быть отрицательными.");
         }
-        userJpaRepository.findById(userId).orElseThrow(() ->
-                new ObjectNotFoundException(USER_NOT_FOUND));
-
+        userRepository.findById(userId)
+                .orElseThrow(() -> new ObjectNotFoundException(USER_NOT_FOUND));
         return itemRequestRepository
                 .findAllByRequestorIdIsNot(userId, PageRequest.of((from / size), size, Sort.by("created")
                                 .descending()))
@@ -86,7 +85,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     private List<ItemDto> putItemDtoToRequest(ItemRequest itemRequest) {
-        return itemRepository.findAllByRequest_Id(itemRequest.getId()).stream()
+        return itemRepository.findAllByRequest_Id(itemRequest.getId())
+                .stream()
                 .map(RequestMapper::toRequestItemDto)
                 .collect(Collectors.toList());
     }

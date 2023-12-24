@@ -85,12 +85,12 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto addItem(Long userId, ItemDto itemDto) {
         if (itemCheck(itemDto)) {
+            log.info("Недопустимое тело элемента.");
             throw new InvalidEntityException("Недопустимое тело элемента.");
         }
         Item newItem = ItemMapper.toItem(itemDto);
         newItem.setOwner(userRepository.findById(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("Пользователь не найден.")));
-
         if (itemDto.getRequestId() == null) {
             return ItemMapper.toItemDto(repository.save(newItem));
         }
@@ -109,7 +109,6 @@ public class ItemServiceImpl implements ItemService {
             log.info("Товар не принадлежит этому пользователю.");
             throw new ObjectNotFoundException("Товар не принадлежит этому пользователю.");
         }
-
         updatedItem = itemUpdate(updatedItem, itemDto);
         repository.save(updatedItem);
         return ItemMapper.toItemDto(updatedItem);

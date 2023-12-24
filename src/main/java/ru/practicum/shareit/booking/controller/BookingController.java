@@ -22,7 +22,8 @@ public class BookingController {
     private final BookingServiceImpl bookingServiceImpl;
 
     @PostMapping
-    public BookingInfoDto addBooking(@RequestHeader(USERID_HEADER) Long userId, @Valid @RequestBody BookingDto bookingDto) {
+    public BookingInfoDto addBooking(@RequestHeader(USERID_HEADER) Long userId,
+                                     @Valid @RequestBody BookingDto bookingDto) {
         log.info("Пришел POST запрос на добавление новой аренды {} от пользователя с id {}", bookingDto, userId);
         return bookingServiceImpl.addBooking(userId, bookingDto);
     }

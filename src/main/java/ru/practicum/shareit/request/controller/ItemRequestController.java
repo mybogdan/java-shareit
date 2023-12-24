@@ -29,7 +29,8 @@ public class ItemRequestController {
     }
 
     @GetMapping("/{requestId}")
-    public ItemRequestDto getRequestById(@RequestHeader(USERID_HEADER) Long userId, @PathVariable Long requestId) {
+    public ItemRequestDto getRequestById(@RequestHeader(USERID_HEADER) Long userId,
+                                         @PathVariable Long requestId) {
         log.info("Получен GET запрос по эндпоинту /requests/{} на получение ItemRequest c ID {} для User с ID {}.",
                 requestId, requestId, userId);
         return itemRequestService.getRequestById(userId, requestId);
@@ -41,7 +42,8 @@ public class ItemRequestController {
             @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero Integer from,
             @RequestParam(name = "size", defaultValue = "10") @Positive Integer size) {
 
-        log.info("Получен GET запрос по эндпоинту /requests/all на получение всех ItemRequest для User с ID {}.", userId);
+        log.info("Получен GET запрос по эндпоинту /requests/all на получение всех ItemRequest для User с ID {}.",
+                userId);
         return itemRequestService.getAllRequest(userId, from, size);
     }
 
