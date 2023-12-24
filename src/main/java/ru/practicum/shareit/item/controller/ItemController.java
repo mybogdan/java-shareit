@@ -22,25 +22,24 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping
-    public List<ItemInfoDto> getAllItems(@RequestHeader(USERID_HEADER) Long userId) {
+    public List<ItemInfoDto> getItems(@RequestHeader(USERID_HEADER) Long userId) {
         log.info("Получен GET запрос по эндпоинту /items от User(Owner) c ID {} на получение списка всех своих Items.",
                 userId);
-        return itemService.getAllItems(userId);
+        return itemService.getItems(userId);
     }
 
     @GetMapping("/{itemId}")
-    public ItemInfoDto getItemById(@RequestHeader(USERID_HEADER) Long userId, @PathVariable Long itemId) {
+    public ItemInfoDto getItem(@RequestHeader(USERID_HEADER) Long userId, @PathVariable Long itemId) {
         log.info("Получен GET запрос по эндпоинту /items/{} от User c ID {} на получение Item с ID {}.", itemId, userId,
                 itemId);
-        return itemService.getItemById(userId, itemId);
+        return itemService.getItem(userId, itemId);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItems(@RequestHeader(USERID_HEADER) Long userId, @RequestParam String text) {
+    public List<ItemDto> searchItems(@RequestParam String text) {
         log.info(
-                "Получен GET запрос по эндпоинту /items/search от User c ID {} на получение списка Item по запросу '{}'.",
-                userId, text);
-        return itemService.searchItems(userId, text);
+                "Получен GET запрос по эндпоинту /items/search на получение списка Item по запросу '{}'.", text);
+        return itemService.searchItems(text);
     }
 
     @PostMapping
@@ -62,10 +61,9 @@ public class ItemController {
     }
 
     @DeleteMapping("/{itemId}")
-    public void deleteItem(@RequestHeader(USERID_HEADER) Long userId, @PathVariable Long itemId) {
-        log.info("Получен DELETE запрос по эндпоинту /items/{} от User(Owner) c ID {} на удаление Item с ID {}.", itemId,
-                userId, itemId);
-        itemService.deleteItem(userId, itemId);
+    public void deleteItem(@PathVariable Long itemId) {
+        log.info("Получен DELETE запрос по эндпоинту /items/{} на удаление Item с ID {}.", itemId);
+        itemService.deleteItem(itemId);
     }
 
     @PostMapping("/{itemId}/comment")

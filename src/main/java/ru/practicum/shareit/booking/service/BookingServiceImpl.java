@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -44,7 +45,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingInfoDto addBooking(Long userId, BookingDto bookingDto) {
-        if (!BookingValidator.bookingValidate(bookingDto)) {
+        if (!BookingValidator.isBookingTimeIntervalValid(bookingDto)) {
             log.info("BookingDto недействителен.");
             throw new InvalidEntityException("BookingDto недействителен.");
         }
@@ -115,7 +116,11 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingInfoDto> getBooking(Long userId, String stateParam) {
+    public List<BookingInfoDto> getBooking(Long userId, String stateParam, Integer from, Integer size) {
+
+        if (from < 0 || size < 0) {
+            throw new InvalidEntityException("Аргумент имеет отрицательное значение.");
+        }
 
         BookingState bookingState = checkState(stateParam);
 
@@ -128,7 +133,7 @@ public class BookingServiceImpl implements BookingService {
 
         switch (bookingState) {
             case ALL:
-                bookingList = bookingRepository.findAllByBookerIdOrderByStartDesc(user.getId());
+                bookingList = bookingRepository.findAllByBookerIdOrderByStartDesc(user.getId(), PageRequest.of((from / size), size));
                 break;
             case PAST:
                 bookingList = bookingRepository.findAllByBookerIdAndEndIsBefore(user.getId(), dateTimeNow, sort);
@@ -145,8 +150,6 @@ public class BookingServiceImpl implements BookingService {
             case REJECTED:
                 bookingList = bookingRepository.findAllByBookerIdAndStatus(user.getId(), BookingStatus.REJECTED);
                 break;
-            default:
-                throw new UnknownBookingState(BOOKING_STATE_ERROR);
         }
 
         return bookingList.isEmpty() ? Collections.emptyList() : bookingList.stream()
@@ -155,7 +158,11 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingInfoDto> getOwnerBooking(Long userId, String stateParam) {
+    public List<BookingInfoDto> getOwnerBooking(Long userId, String stateParam, Integer from, Integer size) {
+
+        if (from < 0 || size < 0) {
+            throw new InvalidEntityException("Аргумент имеет отрицательное значение.");
+        }
 
         BookingState bookingState = checkState(stateParam);
 
@@ -168,7 +175,7 @@ public class BookingServiceImpl implements BookingService {
 
         switch (bookingState) {
             case ALL:
-                bookingList = bookingRepository.findAllByItem_Owner_IdOrderByStartDesc(user.getId());
+                bookingList = bookingRepository.findAllByItem_Owner_IdOrderByStartDesc(user.getId(), PageRequest.of((from / size), size));
                 break;
             case PAST:
                 bookingList = bookingRepository.findAllByItem_Owner_IdAndEndIsBefore(user.getId(), dateTimeNow, sort);
@@ -185,8 +192,6 @@ public class BookingServiceImpl implements BookingService {
             case REJECTED:
                 bookingList = bookingRepository.findAllByItem_Owner_IdAndStatus(user.getId(), BookingStatus.REJECTED);
                 break;
-            default:
-                throw new UnknownBookingState(BOOKING_STATE_ERROR);
         }
 
         return bookingList.isEmpty() ? Collections.emptyList() : bookingList.stream()
