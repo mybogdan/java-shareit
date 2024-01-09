@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository repository;
 
     @Override
-    public List<UserDto> getAllUsers() {
+    public List<UserDto> getUsers() {
         return repository.findAll()
                 .stream()
                 .map(UserMapper::toUserDto)
@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto getUserById(Long userId) {
+    public UserDto getUser(Long userId) {
         return repository.findById(userId).map(UserMapper::toUserDto)
                 .orElseThrow(() -> new ObjectNotFoundException("Пользователь не найден."));
     }
@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void delete(Long userId) {
+    public void deleteUser(Long userId) {
         if (!repository.existsById(userId)) {
             log.info("Пользователь не найден.");
             throw new ObjectNotFoundException("Пользователь не найден.");

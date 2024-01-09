@@ -24,12 +24,6 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public Map<String, String> handleItemAccessDeniedException(final EntityAccessDeniedException e) {
-        return Map.of("409 ENTITY HAVEN'T ACCESS", e.getMessage());
-    }
-
-    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleBadRequestException(final InvalidEntityException e) {
         return Map.of("400 BAD REQUEST", e.getMessage());
@@ -44,7 +38,6 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse methodArgumentNotValidException(final MethodArgumentNotValidException e) {
-        return new ErrorResponse(e.getMessage()
-        );
+        return new ErrorResponse(e.getMessage());
     }
 }
