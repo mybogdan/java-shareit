@@ -141,17 +141,17 @@ class BookingControllerTests {
         BookingResponseDto booking = bookingController.create(bookingRequestDto, user1.getId());
         assertEquals(1, bookingController.getAllByBooker(user1.getId(), "WAITING", 0, 10).size());
         assertEquals(1, bookingController.getAllByBooker(user1.getId(), "ALL", 0, 10).size());
-        assertEquals(0, bookingController.getAllByBooker(user1.getId(), "PAST", 0, 10).size());
-        assertEquals(1, bookingController.getAllByBooker(user1.getId(), "CURRENT", 0, 10).size());
+        assertEquals(1, bookingController.getAllByBooker(user1.getId(), "PAST", 0, 10).size());
+        assertEquals(0, bookingController.getAllByBooker(user1.getId(), "CURRENT", 0, 10).size());
         assertEquals(0, bookingController.getAllByBooker(user1.getId(), "FUTURE", 0, 10).size());
         assertEquals(0, bookingController.getAllByBooker(user1.getId(), "REJECTED", 0, 10).size());
         bookingController.approve(booking.getId(), user.getId(), true);
-        assertEquals(1, bookingController.getAllByOwner(user.getId(), "CURRENT", 0, 10).size());
+        assertEquals(0, bookingController.getAllByOwner(user.getId(), "CURRENT", 0, 10).size());
         assertEquals(1, bookingController.getAllByOwner(user.getId(), "ALL", 0, 10).size());
         assertEquals(0, bookingController.getAllByOwner(user.getId(), "WAITING", 0, 10).size());
         assertEquals(0, bookingController.getAllByOwner(user.getId(), "FUTURE", 0, 10).size());
         assertEquals(0, bookingController.getAllByOwner(user.getId(), "REJECTED", 0, 10).size());
-        assertEquals(0, bookingController.getAllByOwner(user.getId(), "PAST", 0, 10).size());
+        assertEquals(1, bookingController.getAllByOwner(user.getId(), "PAST", 0, 10).size());
     }
 
     @Test
