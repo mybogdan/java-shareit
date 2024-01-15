@@ -18,8 +18,8 @@ public class ItemController {
 
     @GetMapping
     public ResponseEntity<Object> findAll(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                  @RequestParam(defaultValue = "0") int from,
-                                  @RequestParam(defaultValue = "10") int size) {
+                                          @RequestParam(defaultValue = "0") int from,
+                                          @RequestParam(defaultValue = "10") int size) {
         log.info("Пришел /GET запрос на получение всех объектов пользователя с id {}", userId);
         ResponseEntity<Object> items = itemClient.findAll(userId, from, size);
         log.info("Ответ отправлен{}", items);
@@ -44,7 +44,7 @@ public class ItemController {
 
     @PatchMapping("/{itemId}")
     public ResponseEntity<Object> update(@RequestBody ItemRequestDto itemDto, @PathVariable Long itemId,
-                          @RequestHeader("X-Sharer-User-Id") Long userId) {
+                                         @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Пришел /PATCH запрос на обновление объекта на {}, с id {}, и id {} пользователя", itemDto, itemId, userId);
         ResponseEntity<Object> item = itemClient.update(itemId, userId, itemDto);
         log.info("Ответ отправлен {}", item);
@@ -53,8 +53,8 @@ public class ItemController {
 
     @GetMapping("/search")
     public ResponseEntity<Object> search(@RequestParam String text,
-                                @RequestParam(defaultValue = "0") int from,
-                                @RequestParam(defaultValue = "10") int size) {
+                                         @RequestParam(defaultValue = "0") int from,
+                                         @RequestParam(defaultValue = "10") int size) {
         log.info("Пришел /GET запрос на поиск объекта {}", text);
         ResponseEntity<Object> items = itemClient.search(text, from, size);
         log.info("Ответ отправлен {}", items);
@@ -63,7 +63,7 @@ public class ItemController {
 
     @PostMapping("/{itemId}/comment")
     public ResponseEntity<Object> addComment(@PathVariable Long itemId, @RequestHeader("X-Sharer-User-Id") Long userId,
-                                 @Valid @RequestBody CommentRequestDto commentDto) {
+                                             @Valid @RequestBody CommentRequestDto commentDto) {
         log.info("Пришел /POST запрос на добавление комментария предмету {} от пользователя с id {}", itemId, userId);
         ResponseEntity<Object> comment = itemClient.addComment(itemId, userId, commentDto);
         log.info("Ответ отправлен {}", comment);

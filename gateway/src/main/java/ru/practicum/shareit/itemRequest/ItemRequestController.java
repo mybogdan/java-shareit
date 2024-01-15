@@ -17,7 +17,7 @@ public class ItemRequestController {
 
     @PostMapping
     public ResponseEntity<Object> create(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                 @Valid @RequestBody ItemRequestRequestDto itemRequestDto) {
+                                         @Valid @RequestBody ItemRequestRequestDto itemRequestDto) {
         log.info("Пришел /POST запрос на создание запроса {} от пользователя с id {}", itemRequestDto, userId);
         ResponseEntity<Object> itemRequestResponseDto = itemRequestClientClient.create(userId, itemRequestDto);
         log.info("Ответ отправлен {}", itemRequestResponseDto);
@@ -34,8 +34,8 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public ResponseEntity<Object> getAll(@RequestParam(defaultValue = "0") int from,
-                                               @RequestParam(defaultValue = "10") int size,
-                                               @RequestHeader("X-Sharer-User-Id") Long userId) {
+                                         @RequestParam(defaultValue = "10") int size,
+                                         @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Пришел /GET запрос на получение списка запросов от пользователя с id {} созданных другим пользователем",
                 userId);
         ResponseEntity<Object> itemRequestResponseDtos = itemRequestClientClient.getAll(userId, from, size);
